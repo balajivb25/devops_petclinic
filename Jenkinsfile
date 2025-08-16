@@ -20,7 +20,7 @@ pipeline {
                     tomcat9(
                         credentialsId: 'tomcat10-admin',   // Jenkins credential ID
                         path: '',                              // Context path, leave empty for ROOT
-                        url: 'http://localhost/:9090'       // Tomcat manager URL
+                        url: 'http://localhost:9090'       // Tomcat manager URL
                     )
                 ], contextPath: 'petclinic', war: '**/target/petclinic.war'
             }
