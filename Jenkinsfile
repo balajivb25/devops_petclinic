@@ -18,7 +18,7 @@ pipeline {
             steps {
                 deploy adapters: [
                     tomcat9(
-                        credentialsId: 'tomcat-credentials',   // Jenkins credential ID
+                        credentialsId: 'tomcat10-admin',   // Jenkins credential ID
                         path: '',                              // Context path, leave empty for ROOT
                         url: 'http://localhost/:9090'       // Tomcat manager URL
                     )
