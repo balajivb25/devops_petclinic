@@ -22,7 +22,7 @@ pipeline {
                         path: '',                              // Context path, leave empty for ROOT
                         url: 'http://localhost/:9090'       // Tomcat manager URL
                     )
-                ], contextPath: 'petclinic', war: '**/*.war'
+                ], contextPath: 'petclinic', war: '**/target/petclinic.war'
             }
         }
     }
