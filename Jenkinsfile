@@ -8,9 +8,9 @@ pipeline {
 
     environment {
         DEPLOY_URL = 'http://localhost:9090'
-            TOMCAT_CREDS = 'tomcat10-admin'
-            GIT_REPO = 'https://github.com/balajivb25/devops_petclinic.git'
-            GIT_BRANCH = 'main'
+        TOMCAT_CREDS = 'tomcat10-admin'
+        //GIT_REPO = 'https://github.com/balajivb25/devops_petclinic.git'
+        //GIT_BRANCH = 'main'
     }
 
     stages {
@@ -23,7 +23,15 @@ pipeline {
                     checkout scm // automatically uses the repo configured in Jenkins job
                     script {
                         def commit = sh(returnStdout: true, script: "git rev-parse --short HEAD").trim()
-                            currentBuild.displayName = "#${env.BUILD_NUMBER} by ${BUILD_USER} (CommitID ${commit})"
+                        def committerName = sh(returnStdout: true, script: "git log -1 --pretty=format:'%cn'").trim()
+                        // Get committer email
+                        def committerEmail = sh(returnStdout: true, script: "git log -1 --pretty=format:'%ce'").trim()
+                        echo "Commit: ${commitHash}"
+                        echo "Committer: ${committerName} <${committerEmail}>"
+                        
+                        // Optional: set build display name
+                        currentBuild.displayName = "#${env.BUILD_NUMBER} by ${BUILD_USER} (CommitID ${commit})"
+                        currentBuild.description = "Triggered by ${BUILD_USER} on commit ${commit} and GitHub User: ${committerName}"
                     }
                     /*echo "Full Name: ${BUILD_USER_FULL_NAME}"
                     echo "Email: ${BUILD_USER_EMAIL}"
