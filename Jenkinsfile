@@ -101,8 +101,8 @@ pipeline {
                                       credentialsId: 'tomcat10-admin',
                                       url: 'http://localhost:9090'
                                       //credentialsId: "${env.TOMCAT_CREDS}",
-                                      //path: '', // Context path, leave empty for ROOT 
-                                      url: "${env.DEPLOY_URL}"
+                                      path: '', // Context path, leave empty for ROOT 
+                                      //url: "${env.DEPLOY_URL}"
                                   ) 
                     ], contextPath: 'petclinic', war: '**/target/*.war'
                 /*script {
