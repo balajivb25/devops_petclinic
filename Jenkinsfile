@@ -20,8 +20,6 @@ pipeline {
                 wrap([$class: 'BuildUser']) {
                     echo "Build triggered by: ${BUILD_USER}"
                     echo "User ID: ${BUILD_USER_ID}"
-                    echo "Full Name: ${BUILD_USER_FULL_NAME}"
-                    echo "Email: ${BUILD_USER_EMAIL}"
                     checkout scm // automatically uses the repo configured in Jenkins job
                     script {
                         // Short commit hash
