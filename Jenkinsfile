@@ -95,13 +95,13 @@ pipeline {
         stage('Deploy to Tomcat') {
             steps {
                 deploy adapters: 
-                    [ 
+                    [
                     tomcat9
                                   (
-                                      //credentialsId: 'tomcat10-admin',
-                                      //url: 'http://localhost:9090'
-                                      credentialsId: "${env.TOMCAT_CREDS}",
-                                      path: '', // Context path, leave empty for ROOT 
+                                      credentialsId: 'tomcat10-admin',
+                                      url: 'http://localhost:9090'
+                                      //credentialsId: "${env.TOMCAT_CREDS}",
+                                      //path: '', // Context path, leave empty for ROOT 
                                       url: "${env.DEPLOY_URL}"
                                   ) 
                     ], contextPath: 'petclinic', war: '**/target/*.war'
