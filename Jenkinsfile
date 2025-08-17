@@ -85,7 +85,18 @@ pipeline {
 
         stage('Deploy to Tomcat') {
             steps {
-                script {
+                deploy adapters: 
+                    [ 
+                    tomcat9
+                                  (
+                                      //credentialsId: 'tomcat10-admin',
+                                      //url: 'http://localhost:9090'
+                                      credentialsId: "${env.TOMCAT_CREDS}",
+                                      path: '', // Context path, leave empty for ROOT 
+                                      url: "${env.DEPLOY_URL}"
+                                  ) 
+                    ], contextPath: 'petclinic', war: '**/target/*.war'
+                /*script {
                     def wars = findFiles(glob: '**/target/*.war')
                     for (w in wars) {
                         def appName = w.name.replace('.war','')
@@ -97,7 +108,8 @@ pipeline {
                             )
                         ], contextPath: appName, war: w.path
                     }
-                }
+                }*/
+                
             }
         }
     }
