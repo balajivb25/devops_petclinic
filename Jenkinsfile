@@ -33,10 +33,11 @@ pipeline {
                     url: "${env.GIT_REPO}"
 
                 script {
-                    def author = sh(returnStdout: true, script: "git log -1 --pretty=format:'%an'").trim()
-                    def commitHash = sh(returnStdout: true, script: "git rev-parse --short HEAD").trim()
+                    //def author = sh(returnStdout: true, script: "git log -1 --pretty=format:'%an'").trim()
+                    //def commitHash = sh(returnStdout: true, script: "git rev-parse --short HEAD").trim()
                     currentBuild.displayName = "#${env.BUILD_NUMBER} - ${env.GIT_BRANCH}"
-                    currentBuild.description = "Commit ${commitHash} by ${author} (Triggered by ${BUILD_USER})"
+                    //currentBuild.description = "Commit ${commitHash} by ${author} (Triggered by ${BUILD_USER})"
+                    currentBuild.description = "Triggered by ${BUILD_USER} on commit ${GIT_COMMIT[0..6]}"
                 }
             }
         }
@@ -98,7 +99,8 @@ pipeline {
 
     post {
         success {
-            emailext(
+            echo '✅ SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}'
+            /*emailext(
                 to: "${BUILD_USER_EMAIL}",
                 subject: "✅ SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                 body: """
@@ -110,10 +112,11 @@ pipeline {
                 Build: #${env.BUILD_NUMBER}
                 URL: ${env.BUILD_URL}
                 """
-            )
+            )*/
         }
         failure {
-            emailext(
+            echo '❌ Build failed! ${env.JOB_NAME} #${env.BUILD_NUMBER}'
+            /*emailext(
                 to: "balajiv.b25@gmail.com",
                 subject: "❌ FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                 body: """
@@ -123,7 +126,7 @@ pipeline {
                 Build: #${env.BUILD_NUMBER}
                 URL: ${env.BUILD_URL}
                 """
-            )
+            )*/
         }
     }
 }
