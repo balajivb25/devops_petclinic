@@ -25,11 +25,11 @@ pipeline {
                         // Short commit hash
                         def commit = bat(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
                         // Committer email
-                        def committerEmail = bat(returnStdout: true, script: 'git --no-pager show -s --format=%ce').trim() 
-                        echo "COMMITTER_EMAIL: ${COMMITTER_EMAIL}" 
+                        //def committerEmail = bat(returnStdout: true, script: 'git --no-pager show -s --format=%ce').trim() 
+                        //echo "COMMITTER_EMAIL: ${COMMITTER_EMAIL}" 
                         // Optional: set build display name
                         currentBuild.displayName = "#${env.BUILD_NUMBER} by ${BUILD_USER} (CommitID ${commit})"
-                        currentBuild.description = "Triggered by ${BUILD_USER} on commit ${commit} and GitHub User: ${COMMITTER_EMAIL}"
+                        currentBuild.description = "Triggered by ${BUILD_USER} on commit ${commit}" //and GitHub User: ${COMMITTER_EMAIL}"
                     }
 				}
 			}
