@@ -15,11 +15,16 @@ pipeline {
 
     stages {
 
-        stage('Init') {
+        stage('Init & CheckOut') {
             steps {
                 wrap([$class: 'BuildUser']) {
                     echo "Build triggered by: ${BUILD_USER}"
                     echo "User ID: ${BUILD_USER_ID}"
+                    checkout scm // automatically uses the repo configured in Jenkins job
+                    script {
+                        def commit = sh(returnStdout: true, script: "git rev-parse --short HEAD").trim()
+                            currentBuild.displayName = "#${env.BUILD_NUMBER} - ${BUILD_USER} (${commit})"
+                    }
                     /*echo "Full Name: ${BUILD_USER_FULL_NAME}"
                     echo "Email: ${BUILD_USER_EMAIL}"
                     script {
@@ -29,32 +34,6 @@ pipeline {
 				}
 			}
 		}
-		
-        stage('Checkout') {
-            steps {
-                checkout scm // automatically uses the repo configured in Jenkins job
-                script {
-                    def commit = sh(returnStdout: true, script: "git rev-parse --short HEAD").trim()
-                        currentBuild.displayName = "#${env.BUILD_NUMBER} - ${BUILD_USER} (${commit})"
-                }
-            }
-        }
-
-        /*stage('Checkout') {
-        steps {
-        git branch: "${env.GIT_BRANCH}",
-        credentialsId: 'github-https',
-        url: "${env.GIT_REPO}"
-
-        script {
-        //def author = sh(returnStdout: true, script: "git log -1 --pretty=format:'%an'").trim()
-        //def commitHash = sh(returnStdout: true, script: "git rev-parse --short HEAD").trim()
-        currentBuild.displayName = "#${env.BUILD_NUMBER} - ${env.GIT_BRANCH} - ${BUILD_USER_ID}"
-        //currentBuild.description = "Commit ${commitHash} by ${author} (Triggered by ${BUILD_USER})"
-        currentBuild.description = "Triggered by ${BUILD_USER} on commit ${GIT_COMMIT[0..6]}"
-        }
-        }
-        }*/
 
         stage('Build') {
             steps {
