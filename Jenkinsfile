@@ -29,7 +29,7 @@ pipeline {
                 }
                 
             }
-        }
+        
         stage('Checkout') {
                 steps {
                     checkout scm  // automatically uses the repo configured in Jenkins job
