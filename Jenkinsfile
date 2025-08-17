@@ -16,13 +16,18 @@ pipeline {
 
         stage('Deploy to Tomcat') {
             steps {
-                deploy adapters: [
-                    tomcat9(
-                        credentialsId: 'tomcat10-admin',   // Jenkins credential ID
-                        path: '',                              // Context path, leave empty for ROOT
-                        url: 'http://localhost:9090'       // Tomcat manager URL
-                    )
-                ], contextPath: 'petclinic', war: '**/target/*.war'
+                script {
+                    def wars = findFiles(glob: '**/target/*.war')
+                    for (w in wars) {
+                    def appName = w.name.replace('.war','')
+                    deploy adapters: [
+                        tomcat9(
+                            credentialsId: 'tomcat10-admin',
+                            url: 'http://localhost:9090'
+                        )
+                    ], contextPath: appName, war: w.path
+                    }
+                }
             }
         }
     }
