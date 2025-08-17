@@ -109,21 +109,6 @@ pipeline {
                 ],
                 contextPath: 'petclinic',
                 war: '**/target/*.war'
-                /*script {
-                def wars = findFiles(glob: '**/
-                target /*.war')
-                for (w in wars) {
-                def appName = w.name.replace('.war','')
-                echo "Deploying ${appName} → ${DEPLOY_URL}"
-                deploy adapters: [
-                tomcat10(
-                credentialsId: "${env.TOMCAT_CREDS}",
-                url: "${env.DEPLOY_URL}"
-                )
-                ], contextPath: appName, war: w.path
-                }
-                }*/
-
             }
         }
 
