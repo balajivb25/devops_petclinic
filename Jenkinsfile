@@ -2,41 +2,42 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven3.9.9'    // Name from Global Tool Config
-        jdk 'JDK21'           // Name from Global Tool Config
+        maven 'Maven3.9.9'    // From Global Tool Config
+        jdk 'JDK21'
     }
 
     environment {
-        DEPLOY_URL = 'http://localhost:9090'
+        DEPLOY_URL   = 'http://localhost:9090'
         TOMCAT_CREDS = 'tomcat10-admin'
-        GIT_REPO = 'https://github.com/balajivb25/devops_petclinic.git'
-        GIT_BRANCH = 'main'
+        GIT_REPO     = 'https://github.com/balajivb25/devops_petclinic.git'
+        GIT_BRANCH   = 'main'
     }
 
     stages {
 
         stage('Init') {
             steps {
-                // Populate environment vars from Build User plugin
                 wrap([$class: 'BuildUser']) {
                     echo "Build triggered by: ${BUILD_USER}"
                     echo "User ID: ${BUILD_USER_ID}"
-                    echo "Full Name: ${BUILD_USER_FULL_NAME}"
-                    echo "Email: ${BUILD_USER_EMAIL}"
-                    script {
-                        def author = sh(returnStdout: true, script: "git log -1 --pretty=format:'%an'").trim()
-                        currentBuild.displayName = "#${env.BUILD_NUMBER} - ${env.GIT_BRANCH ?: 'no-branch'}"
-                        currentBuild.description = "Triggered by ${BUILD_USER} on commit ${GIT_COMMIT[0..6]} by ${author}"
-                    }
+                    //echo "Full Name: ${BUILD_USER_FULL_NAME}"
+                    //echo "Email: ${BUILD_USER_EMAIL}"
                 }
             }
         }
-        
+
         stage('Checkout') {
             steps {
                 git branch: "${env.GIT_BRANCH}",
                     credentialsId: 'github-https',
                     url: "${env.GIT_REPO}"
+
+                script {
+                    def author = sh(returnStdout: true, script: "git log -1 --pretty=format:'%an'").trim()
+                    def commitHash = sh(returnStdout: true, script: "git rev-parse --short HEAD").trim()
+                    currentBuild.displayName = "#${env.BUILD_NUMBER} - ${env.GIT_BRANCH}"
+                    currentBuild.description = "Commit ${commitHash} by ${author} (Triggered by ${BUILD_USER})"
+                }
             }
         }
 
@@ -58,18 +59,18 @@ pipeline {
                 }
             }
         }
-		
+
         stage('Find WAR Files') {
             steps {
                 script {
                     def files = findFiles(glob: '**/*.war')
                     files.each { f ->
-                    echo "Found WAR file: ${f.path}"
+                        echo "Found WAR file: ${f.path}"
                     }
                 }
             }
         }
-		
+
         stage('Archive Artifacts') {
             steps {
                 archiveArtifacts artifacts: '**/target/*.war', fingerprint: true
@@ -84,7 +85,7 @@ pipeline {
                         def appName = w.name.replace('.war','')
                         echo "Deploying ${appName} → ${DEPLOY_URL}"
                         deploy adapters: [
-                            tomcat9(
+                            tomcat10(
                                 credentialsId: "${env.TOMCAT_CREDS}",
                                 url: "${env.DEPLOY_URL}"
                             )
@@ -97,12 +98,19 @@ pipeline {
 
     post {
         success {
-            echo '✅ Build & Deployment successful!'
-            wrap([$class: 'BuildUser']) {
-            mail to: "${BUILD_USER_EMAIL}",
-                 subject: "Build #${env.BUILD_NUMBER} Success",
-                 body: "Hi ${BUILD_USER_FULL_NAME},\n\nYour build succeeded."
-            }
+            emailext(
+                to: "${BUILD_USER_EMAIL}",
+                subject: "✅ SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+                Hi ${BUILD_USER_FULL_NAME},
+
+                Your build succeeded.
+
+                Job: ${env.JOB_NAME}
+                Build: #${env.BUILD_NUMBER}
+                URL: ${env.BUILD_URL}
+                """
+            )
         }
         failure {
             emailext(
@@ -110,6 +118,7 @@ pipeline {
                 subject: "❌ FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                 body: """
                 The Jenkins build has failed.
+
                 Job: ${env.JOB_NAME}
                 Build: #${env.BUILD_NUMBER}
                 URL: ${env.BUILD_URL}
