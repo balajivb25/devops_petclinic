@@ -9,8 +9,8 @@ pipeline {
             steps {
                 sh 'java -version'
                 sh 'mvn -version'
-                sh 'mvn -B -DskipTests clean package'
-                //sh 'mvn clean install'
+                //sh 'mvn -B -DskipTests clean package'
+                sh 'mvn clean install'
             }
         }
 
