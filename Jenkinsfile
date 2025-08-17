@@ -20,21 +20,19 @@ pipeline {
                 wrap([$class: 'BuildUser']) {
                     echo "Build triggered by: ${BUILD_USER}"
                     echo "User ID: ${BUILD_USER_ID}"
+                    echo "Full Name: ${BUILD_USER_FULL_NAME}"
+                    echo "Email: ${BUILD_USER_EMAIL}"
                     checkout scm // automatically uses the repo configured in Jenkins job
                     script {
-                        def commit = sh(returnStdout: true, script: "git rev-parse --short HEAD").trim()
-                        def COMMITTER_EMAIL = bat(script: "git --no-pager show -s --format='%%ae'", returnStdout: true).split('\r\n')[2].trim() 
+                        // Short commit hash
+                        def commit = bat(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+                        // Committer email
+                        def committerEmail = bat(returnStdout: true, script: 'git --no-pager show -s --format=%ce').trim() 
                         echo "COMMITTER_EMAIL: ${COMMITTER_EMAIL}" 
                         // Optional: set build display name
                         currentBuild.displayName = "#${env.BUILD_NUMBER} by ${BUILD_USER} (CommitID ${commit})"
                         currentBuild.description = "Triggered by ${BUILD_USER} on commit ${commit} and GitHub User: ${COMMITTER_EMAIL}"
                     }
-                    /*echo "Full Name: ${BUILD_USER_FULL_NAME}"
-                    echo "Email: ${BUILD_USER_EMAIL}"
-                    script {
-                    currentBuild.displayName = "#${env.BUILD_NUMBER} - ${env.BUILD_USER}"
-                    currentBuild.description = "Triggered by ${BUILD_USER} on commit ${GIT_COMMIT[0..6]}"
-					}*/
 				}
 			}
 		}
