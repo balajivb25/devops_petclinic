@@ -15,6 +15,23 @@ pipeline {
 
     stages {
 
+        stage('Init') {
+            steps {
+                // Populate environment vars from Build User plugin
+                wrap([$class: 'BuildUser']) {
+                    echo "Build triggered by: ${BUILD_USER}"
+                    echo "User ID: ${BUILD_USER_ID}"
+                    echo "Full Name: ${BUILD_USER_FULL_NAME}"
+                    echo "Email: ${BUILD_USER_EMAIL}"
+                    script {
+                        def author = sh(returnStdout: true, script: "git log -1 --pretty=format:'%an'").trim()
+                        currentBuild.displayName = "#${env.BUILD_NUMBER} - ${env.GIT_BRANCH ?: 'no-branch'}"
+                        currentBuild.description = "Triggered by ${BUILD_USER} on commit ${GIT_COMMIT[0..6]} by ${author}"
+                    }
+                }
+            }
+        }
+        
         stage('Checkout') {
             steps {
                 git branch: "${env.GIT_BRANCH}",
@@ -81,6 +98,11 @@ pipeline {
     post {
         success {
             echo '✅ Build & Deployment successful!'
+            wrap([$class: 'BuildUser']) {
+            mail to: "${BUILD_USER_EMAIL}",
+                 subject: "Build #${env.BUILD_NUMBER} Success",
+                 body: "Hi ${BUILD_USER_FULL_NAME},\n\nYour build succeeded."
+            }
         }
         failure {
             emailext(
