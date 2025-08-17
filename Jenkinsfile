@@ -22,11 +22,16 @@ pipeline {
                     echo "User ID: ${BUILD_USER_ID}"
                     //echo "Full Name: ${BUILD_USER_FULL_NAME}"
                     //echo "Email: ${BUILD_USER_EMAIL}"
+                    script {
+                    currentBuild.displayName = "#${env.BUILD_NUMBER} - ${env.BUILD_USER}"
+                    //currentBuild.description = "Triggered by ${BUILD_USER} on commit ${GIT_COMMIT[0..6]}"
                 }
+                }
+                
             }
         }
 
-        stage('Checkout') {
+        /*stage('Checkout') {
             steps {
                 git branch: "${env.GIT_BRANCH}",
                     credentialsId: 'github-https',
@@ -35,12 +40,12 @@ pipeline {
                 script {
                     //def author = sh(returnStdout: true, script: "git log -1 --pretty=format:'%an'").trim()
                     //def commitHash = sh(returnStdout: true, script: "git rev-parse --short HEAD").trim()
-                    currentBuild.displayName = "#${env.BUILD_NUMBER} - ${env.GIT_BRANCH}"
+                    currentBuild.displayName = "#${env.BUILD_NUMBER} - ${env.GIT_BRANCH} - ${BUILD_USER_ID}"
                     //currentBuild.description = "Commit ${commitHash} by ${author} (Triggered by ${BUILD_USER})"
                     currentBuild.description = "Triggered by ${BUILD_USER} on commit ${GIT_COMMIT[0..6]}"
                 }
             }
-        }
+        }*/
 
         stage('Build') {
             steps {
