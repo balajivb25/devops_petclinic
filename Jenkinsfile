@@ -23,7 +23,7 @@ pipeline {
                     checkout scm // automatically uses the repo configured in Jenkins job
                     script {
                         // Short commit hash
-                        def commit = bat(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+                        def commit = sh(returnStdout: true, script: "git rev-parse --short HEAD").trim()
                         // Committer email
                         //def committerEmail = bat(returnStdout: true, script: 'git --no-pager show -s --format=%ce').trim() 
                         //echo "COMMITTER_EMAIL: ${COMMITTER_EMAIL}" 
