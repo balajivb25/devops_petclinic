@@ -23,7 +23,7 @@ pipeline {
                     checkout scm // automatically uses the repo configured in Jenkins job
                     script {
                         def commit = sh(returnStdout: true, script: "git rev-parse --short HEAD").trim()
-                            currentBuild.displayName = "#${env.BUILD_NUMBER} - ${BUILD_USER} (${commit})"
+                            currentBuild.displayName = "#${env.BUILD_NUMBER} by ${BUILD_USER} (CommitID ${commit})"
                     }
                     /*echo "Full Name: ${BUILD_USER_FULL_NAME}"
                     echo "Email: ${BUILD_USER_EMAIL}"
