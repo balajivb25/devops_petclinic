@@ -14,6 +14,17 @@ pipeline {
             }
         }
 
+        stage('Find WAR Files') {
+            steps {
+                script {
+                    def files = findFiles(glob: '**/*.war')
+                    files.each { f ->
+                    echo "Found WAR file: ${f.path}"
+                    }
+                }
+            }
+        }
+
         stage('Deploy to Tomcat') {
             steps {
                 script {
